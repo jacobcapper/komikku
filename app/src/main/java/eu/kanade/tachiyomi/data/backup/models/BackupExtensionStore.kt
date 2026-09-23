@@ -4,16 +4,19 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.protobuf.ProtoNumber
 import mihon.domain.extension.model.ExtensionStore
 
+// Every optional field below needs a default: proto3 omits a field on the wire when it's the
+// zero value (""/null/false), and without a default here kotlinx.serialization throws
+// MissingFieldException on decode.
 @Serializable
 class BackupExtensionStore(
     @ProtoNumber(1) var indexUrl: String,
-    @ProtoNumber(2) var name: String,
-    @ProtoNumber(3) var badgeLabel: String?,
-    @ProtoNumber(5) var signingKey: String,
-    @ProtoNumber(4) var contactWebsite: String,
-    @ProtoNumber(6) var contactDiscord: String?,
-    @ProtoNumber(7) var isLegacy: Boolean?,
-    @ProtoNumber(8) var extensionListUrl: String?,
+    @ProtoNumber(2) var name: String = "",
+    @ProtoNumber(3) var badgeLabel: String? = null,
+    @ProtoNumber(5) var signingKey: String = "",
+    @ProtoNumber(4) var contactWebsite: String = "",
+    @ProtoNumber(6) var contactDiscord: String? = null,
+    @ProtoNumber(7) var isLegacy: Boolean? = null,
+    @ProtoNumber(8) var extensionListUrl: String? = null,
 )
 
 val backupExtensionStoreMapper = { store: ExtensionStore ->

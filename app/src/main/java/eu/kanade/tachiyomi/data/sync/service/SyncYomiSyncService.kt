@@ -148,9 +148,9 @@ class SyncYomiSyncService(
             return try {
                 val backup = protoBuf.decodeFromByteArray(Backup.serializer(), byteArray)
                 return Pair(SyncData(backup = backup), newETag)
-            } catch (_: SerializationException) {
+            } catch (e: SerializationException) {
                 logcat(LogPriority.INFO) {
-                    "Bad content responsed from server"
+                    "Bad content responsed from server: ${e::class.simpleName}: ${e.message}"
                 }
                 // the body is invalid
                 // return default value so we can overwrite it

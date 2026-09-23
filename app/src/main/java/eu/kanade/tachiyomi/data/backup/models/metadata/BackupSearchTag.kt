@@ -8,7 +8,9 @@ import kotlinx.serialization.protobuf.ProtoNumber
 data class BackupSearchTag(
     @ProtoNumber(1) var namespace: String? = null,
     @ProtoNumber(2) var name: String,
-    @ProtoNumber(3) var type: Int,
+    // Needs a default: proto3 omits the field on the wire when it's 0, and without a default
+    // here kotlinx.serialization throws MissingFieldException on decode.
+    @ProtoNumber(3) var type: Int = 0,
 ) {
     fun getSearchTag(mangaId: Long): SearchTag {
         return SearchTag(

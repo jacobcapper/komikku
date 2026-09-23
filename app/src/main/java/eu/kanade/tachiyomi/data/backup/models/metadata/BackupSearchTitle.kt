@@ -6,8 +6,10 @@ import kotlinx.serialization.protobuf.ProtoNumber
 
 @Serializable
 data class BackupSearchTitle(
-    @ProtoNumber(1) var title: String,
-    @ProtoNumber(2) var type: Int,
+    // Both need defaults: proto3 omits a field on the wire when it's the zero value (""/0),
+    // and without a default here kotlinx.serialization throws MissingFieldException on decode.
+    @ProtoNumber(1) var title: String = "",
+    @ProtoNumber(2) var type: Int = 0,
 ) {
     fun getSearchTitle(mangaId: Long): SearchTitle {
         return SearchTitle(

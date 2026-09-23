@@ -8,7 +8,9 @@ import kotlinx.serialization.protobuf.ProtoNumber
  */
 @Serializable
 data class BackupSavedSearch(
-    @ProtoNumber(1) val name: String,
+    // Needs a default: proto3 omits the field on the wire when it's "", and without a default
+    // here kotlinx.serialization throws MissingFieldException on decode.
+    @ProtoNumber(1) val name: String = "",
     @ProtoNumber(2) val query: String = "",
     @ProtoNumber(3) val filterList: String = "",
     @ProtoNumber(4) val source: Long = 0,
