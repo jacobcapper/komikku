@@ -9,14 +9,17 @@ import tachiyomi.domain.manga.model.MergedMangaReference
  */
 @Serializable
 data class BackupMergedMangaReference(
-    @ProtoNumber(1) var isInfoManga: Boolean,
-    @ProtoNumber(2) var getChapterUpdates: Boolean,
-    @ProtoNumber(3) var chapterSortMode: Int,
-    @ProtoNumber(4) var chapterPriority: Int,
-    @ProtoNumber(5) var downloadChapters: Boolean,
-    @ProtoNumber(6) var mergeUrl: String,
-    @ProtoNumber(7) var mangaUrl: String,
-    @ProtoNumber(8) var mangaSourceId: Long,
+    // These need defaults: proto3 omits a field on the wire when it's the zero value (false/0/""),
+    // and without a default here kotlinx.serialization throws MissingFieldException on decode --
+    // e.g. any non-"info" manga in a merge group (isInfoManga=false) breaks the whole sync payload.
+    @ProtoNumber(1) var isInfoManga: Boolean = false,
+    @ProtoNumber(2) var getChapterUpdates: Boolean = false,
+    @ProtoNumber(3) var chapterSortMode: Int = 0,
+    @ProtoNumber(4) var chapterPriority: Int = 0,
+    @ProtoNumber(5) var downloadChapters: Boolean = false,
+    @ProtoNumber(6) var mergeUrl: String = "",
+    @ProtoNumber(7) var mangaUrl: String = "",
+    @ProtoNumber(8) var mangaSourceId: Long = 0,
 ) {
     fun getMergedMangaReference(): MergedMangaReference {
         return MergedMangaReference(

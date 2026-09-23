@@ -9,7 +9,10 @@ data class BackupTracking(
     // in 1.x some of these values have different types or names
     @ProtoNumber(1) var syncId: Int,
     // LibraryId is not null in 1.x
-    @ProtoNumber(2) var libraryId: Long,
+    // Needs a default: proto3 omits the field on the wire when it's 0 (trackers without a
+    // numeric library id, e.g. freshly-tracked or MangaDex/MDList), and without a default here
+    // kotlinx.serialization throws MissingFieldException on decode, breaking sync entirely.
+    @ProtoNumber(2) var libraryId: Long = 0,
     @Deprecated("Use mediaId instead", level = DeprecationLevel.WARNING)
     @ProtoNumber(3)
     var mediaIdInt: Int = 0,
