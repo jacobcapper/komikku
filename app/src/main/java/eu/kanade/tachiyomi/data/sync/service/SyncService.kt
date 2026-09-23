@@ -233,7 +233,9 @@ abstract class SyncService(
                     remoteChapter
                 }
                 localChapter != null && remoteChapter != null -> {
-                    // Use version number to decide which chapter to keep
+                    // Use version number to decide which side's metadata (name, scanlator,
+                    // chapter number, fetch/upload dates) to keep -- there's no sensible
+                    // "forward" direction for those fields.
                     val chosenChapter = if (localChapter.version >= remoteChapter.version) {
                         // If there mare more chapter on remote, local sourceOrder will need to be updated to maintain correct source order.
                         if (localChapters.size < remoteChapters.size) {
@@ -243,10 +245,19 @@ abstract class SyncService(
                     } else {
                         remoteChapter
                     }
+                    // Reading progress is sticky and never regresses: a device whose version
+                    // counter is ahead for unrelated reasons (metadata refresh, re-scrape) must
+                    // never revert a chapter another device has already read or read further
+                    // into. This mirrors the same fix applied server-side in SyncYomi tonight.
+                    chosenChapter.read = localChapter.read || remoteChapter.read
+                    chosenChapter.bookmark = localChapter.bookmark || remoteChapter.bookmark
+                    chosenChapter.lastPageRead = maxOf(localChapter.lastPageRead, remoteChapter.lastPageRead)
+                    chosenChapter.version = maxOf(localChapter.version, remoteChapter.version)
                     logcat(LogPriority.DEBUG, logTag) {
-                        "Merging chapter: ${chosenChapter.name}. Chosen version from: ${
+                        "Merging chapter: ${chosenChapter.name}. Metadata from: ${
                             if (localChapter.version >= remoteChapter.version) "Local" else "Remote"
-                        }, Local version: ${localChapter.version}, Remote version: ${remoteChapter.version}."
+                        }, Local version: ${localChapter.version}, Remote version: ${remoteChapter.version}, " +
+                            "merged read: ${chosenChapter.read}, merged lastPageRead: ${chosenChapter.lastPageRead}."
                     }
                     chosenChapter
                 }
